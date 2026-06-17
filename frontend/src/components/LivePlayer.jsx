@@ -5,7 +5,7 @@ export default function LivePlayer() {
   const videoRef = useRef(null);
 
   useEffect(() => {
-    const streamUrl = "/hls/stream123.m3u8";
+    const streamUrl = "http://54.91.27.248:8080/hls/stream123.m3u8";
 
     if (Hls.isSupported()) {
       const hls = new Hls();
