@@ -6,6 +6,7 @@ require("dotenv").config();
 
 const authRoutes = require("./routes/auth");
 const streamRoutes = require("./routes/stream");
+const chatRoutes = require("./routes/chat");
 const socketHandler = require("./websocket/socketHandler");
 
 const app = express();
@@ -24,6 +25,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/stream", streamRoutes);
+app.use("/api/chat", chatRoutes);
 
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
