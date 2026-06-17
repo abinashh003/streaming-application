@@ -1,20 +1,32 @@
 import { useEffect, useRef } from "react";
 import Hls from "hls.js";
+import api from "../services/api";
 
-export default function LivePlayer() {
+export default function LivePlayer({ streamId }) {
   const videoRef = useRef(null);
 
   useEffect(() => {
-    const streamUrl = "http://54.91.27.248:8080/hls/stream123.m3u8";
+    async function loadStream() {
+      try {
+        const res = await api.get(`/stream/${streamId}`);
 
-    if (Hls.isSupported()) {
-      const hls = new Hls();
-      hls.loadSource(streamUrl);
-      hls.attachMedia(videoRef.current);
+        const streamUrl =
+          `http://54.91.27.248:8080${res.data.playbackUrl}`;
 
-      return () => hls.destroy();
+        if (Hls.isSupported()) {
+          const hls = new Hls();
+          hls.loadSource(streamUrl);
+          hls.attachMedia(videoRef.current);
+
+          return () => hls.destroy();
+        }
+      } catch (err) {
+        console.error("Failed to load stream");
+      }
     }
-  }, []);
+
+    loadStream();
+  }, [streamId]);
 
   return (
     <video
