@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import socket from "../services/socket";
 import api from "../services/api";
 
-export default function ChatPanel() {
+export default function ChatPanel({ streamId }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
 
   useEffect(() => {
     async function loadMessages() {
       try {
-        const res = await api.get("/chat/1");
+        const res = await api.get(`/chat/${streamId}`);
         setMessages(res.data.map((msg) => msg.message));
       } catch (err) {
         console.error("Failed to load chat history");
@@ -18,19 +18,25 @@ export default function ChatPanel() {
 
     loadMessages();
 
-    socket.on("chat-message", (msg) => {
-      setMessages((prev) => [...prev, msg]);
+    socket.on("chat-message", (data) => {
+      if (String(data.streamId) === String(streamId)) {
+        setMessages((prev) => [...prev, data.message]);
+      }
     });
 
     return () => {
       socket.off("chat-message");
     };
-  }, []);
+  }, [streamId]);
 
   function sendMessage() {
     if (!input.trim()) return;
 
-    socket.emit("chat-message", input);
+    socket.emit("chat-message", {
+      streamId,
+      message: input
+    });
+
     setInput("");
   }
 
