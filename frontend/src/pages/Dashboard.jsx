@@ -6,16 +6,18 @@ export default function Dashboard() {
 
   const handleGoLive = async () => {
     try {
-      const res = await api.post("/stream");
+      const res = await api.post("/stream", {
+        title: "My Live Stream"
+      });
 
       setStreamInfo({
+        id: res.data.id,
         streamKey: res.data.streamKey,
-        rtmpUrl: res.data.rtmpUrl.replace(
-          "SERVER_IP",
-          "54.91.27.248"
-        )
+        rtmpUrl: res.data.rtmpUrl,
+        viewerUrl: `http://54.91.27.248:5173/stream/${res.data.id}`
       });
     } catch (err) {
+      console.error(err);
       alert("Failed to create stream");
     }
   };
@@ -46,9 +48,11 @@ export default function Dashboard() {
       </button>
 
       {streamInfo && (
-        <div className="mt-8 bg-zinc-900 p-6 rounded-xl">
+        <div className="mt-8 bg-zinc-900 p-6 rounded-xl space-y-3">
+          <p><b>Stream ID:</b> {streamInfo.id}</p>
           <p><b>RTMP URL:</b> {streamInfo.rtmpUrl}</p>
           <p><b>Stream Key:</b> {streamInfo.streamKey}</p>
+          <p><b>Viewer URL:</b> {streamInfo.viewerUrl}</p>
         </div>
       )}
     </div>
